@@ -5,6 +5,14 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Our.Umbraco.Query.Language", "Our.Umbraco.Query.Language\Our.Umbraco.Query.Language.csproj", "{1DDFE341-CDE4-4D5C-A4A6-77819FD02C20}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Our.Umbraco.Query.Language.Tests", "Our.Umbraco.Query.Language.Tests\Our.Umbraco.Query.Language.Tests.csproj", "{8A48B8EA-941F-476C-B409-DEBAABFC25BE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{45BD7E58-7BFE-4461-8F20-40CD5D4417F0}"
+	ProjectSection(SolutionItems) = preProject
+		license.txt = license.txt
+		readme.md = readme.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +23,10 @@ Global
 		{1DDFE341-CDE4-4D5C-A4A6-77819FD02C20}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DDFE341-CDE4-4D5C-A4A6-77819FD02C20}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1DDFE341-CDE4-4D5C-A4A6-77819FD02C20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A48B8EA-941F-476C-B409-DEBAABFC25BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A48B8EA-941F-476C-B409-DEBAABFC25BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A48B8EA-941F-476C-B409-DEBAABFC25BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A48B8EA-941F-476C-B409-DEBAABFC25BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
