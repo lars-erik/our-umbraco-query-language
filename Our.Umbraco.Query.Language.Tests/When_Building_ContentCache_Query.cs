@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace Our.Umbraco.Query.Language.Tests
 {
     [TestFixture]
-    public class When_Building_Linq_Query : ParsingTest
+    public class When_Building_ContentCache_Query : ParsingTest
     {
         [Test]
         public void Gets_Content_Of_Type_From_Cache()
