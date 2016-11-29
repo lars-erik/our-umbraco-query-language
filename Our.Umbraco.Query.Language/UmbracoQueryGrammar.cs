@@ -18,28 +18,78 @@ namespace Our.Umbraco.Query.Language
 
             var number = new NumberLiteral("number");
 
-            var query = new NonTerminal("query", typeof(QueryNode));
+            var query = new NonTerminal("query");
             var limitModifier = new NonTerminal("limitModifier", typeof(LimitModifierNode));
             var orderModifier = new NonTerminal("orderModifier", typeof(OrderModifierNode));
 
             var contentType = new NonTerminal("contentType");
             var content = new NonTerminal("content", typeof(ContentNode));
+            var limitedContent = new NonTerminal("limitedContent", typeof(LimitedContentNode));
+            var orderedContent = new NonTerminal("orderedContent", typeof(OrderedContentNode));
+
+            orderedContent.Rule = orderModifier + content | orderModifier + limitedContent;
+            limitedContent.Rule = limitModifier + content;
 
             content.Rule = contentType;
             contentType.Rule = contentTypeAlias;
             limitModifier.Rule = number;
 
-            query.Rule = content | orderModifier + content |
-                         limitModifier + content | orderModifier + limitModifier + content;
+            query.Rule = content | limitedContent | orderedContent;
+
             orderModifier.Rule = ToTerm("latest");
             
             Root = query;
 
-            MarkTransient(contentType);
+            MarkTransient(contentType, query);
         }
     }
 
-    public class ContentNode : AstNode
+    public interface IVisitable
+    {
+        void Visit(IQueryVisitor visitor);
+    }
+
+    public class OrderedContentNode : AstNode, IVisitable
+    {
+        public OrderModifierNode OrderModifier { get; set; }
+        public IVisitable Content { get; set; }
+
+        public override void Init(AstContext context, ParseTreeNode treeNode)
+        {
+            base.Init(context, treeNode);
+
+            OrderModifier = (OrderModifierNode)treeNode.ChildNodes[0].AstNode;
+            Content = (IVisitable)treeNode.ChildNodes[1].AstNode;
+        }
+
+        public void Visit(IQueryVisitor visitor)
+        {
+            visitor.Visit(Content);
+            visitor.Visit(OrderModifier);
+        }
+    }
+
+    public class LimitedContentNode : AstNode, IVisitable
+    {
+        public LimitModifierNode LimitModifier { get; set; }
+        public IVisitable Content { get; set; }
+
+        public override void Init(AstContext context, ParseTreeNode treeNode)
+        {
+            base.Init(context, treeNode);
+
+            LimitModifier = (LimitModifierNode)treeNode.ChildNodes[0].AstNode;
+            Content = (IVisitable)treeNode.ChildNodes[1].AstNode;
+        }
+
+        public void Visit(IQueryVisitor visitor)
+        {
+            visitor.Visit(Content);
+            visitor.Visit(LimitModifier);
+        }
+    }
+
+    public class ContentNode : AstNode, IVisitable
     {
         public IdentifierNode Identifier { get; set; }
 
@@ -61,43 +111,38 @@ namespace Our.Umbraco.Query.Language
         }
     }
 
-    public class QueryNode : AstNode
-    {
-        public OrderModifierNode OrderModifier { get; private set; }
-        public LimitModifierNode LimitModifier { get; private set; }
-        public ContentNode Source { get; private set; }
+
+
+    //public class QueryNode : AstNode, IVisitable
+    //{
+    //    public IVisitable Query { get; private set; }
         
-        public override void Init(AstContext context, ParseTreeNode treeNode)
-        {
-            base.Init(context, treeNode);
+    //    public override void Init(AstContext context, ParseTreeNode treeNode)
+    //    {
+    //        base.Init(context, treeNode);
 
-            foreach (var child in treeNode.ChildNodes)
-            {
-                SetIfType<OrderModifierNode>(child, n => OrderModifier = n);
-                SetIfType<LimitModifierNode>(child, n => LimitModifier = n);
-                SetIfType<ContentNode>(child, n => Source = n);
-            }
-        }
+    //        Query = 
+    //    }
 
-        private void SetIfType<TType>(ParseTreeNode node, Action<TType> setter)
-            where TType : AstNode
-        {
-            var astNode = node.AstNode as TType;
-            if (astNode != null)
-                setter(astNode);
-        }
+    //    private void SetIfType<TType>(ParseTreeNode node, Action<TType> setter)
+    //        where TType : AstNode
+    //    {
+    //        var astNode = node.AstNode as TType;
+    //        if (astNode != null)
+    //            setter(astNode);
+    //    }
 
-        public void Visit(IQueryVisitor visitor)
-        {
-            visitor.Visit(Source);
-            if (OrderModifier != null)
-                visitor.Visit(OrderModifier);
-            if (LimitModifier != null)
-                visitor.Visit(LimitModifier);
-        }
-    }
+    //    public void Visit(IQueryVisitor visitor)
+    //    {
+    //        visitor.Visit(Source);
+    //        if (OrderModifier != null)
+    //            visitor.Visit(OrderModifier);
+    //        if (LimitModifier != null)
+    //            visitor.Visit(LimitModifier);
+    //    }
+    //}
 
-    public class LimitModifierNode : AstNode
+    public class LimitModifierNode : AstNode, IVisitable
     {
         public int Limit { get; private set; }
 
@@ -115,7 +160,7 @@ namespace Our.Umbraco.Query.Language
         }
     }
 
-    public class OrderModifierNode : AstNode
+    public class OrderModifierNode : AstNode, IVisitable
     {
         public override void Init(AstContext context, ParseTreeNode treeNode)
         {

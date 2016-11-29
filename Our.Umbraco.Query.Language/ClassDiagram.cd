@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Our.Umbraco.Query.Language.ContentNode" BaseTypeListCollapsed="true">
+    <Position X="6.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAASQAAAAAA=</HashCode>
+      <FileName>UmbracoQueryGrammar.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Identifier" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Our.Umbraco.Query.Language.LimitedContentNode" BaseTypeListCollapsed="true">
+    <Position X="2" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAQAAQAAAAAAAAAAAAAAAAAAAACAAAAAAA=</HashCode>
+      <FileName>UmbracoQueryGrammar.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Content" />
+      <Property Name="LimitModifier" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Our.Umbraco.Query.Language.LimitModifierNode" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAQAAAAAAAAAAAAACAAAAAAA=</HashCode>
+      <FileName>UmbracoQueryGrammar.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Our.Umbraco.Query.Language.OrderedContentNode" BaseTypeListCollapsed="true">
+    <Position X="2" Y="5.75" Width="1.5" />
+    <AssociationLine Name="Content" Type="Our.Umbraco.Query.Language.IVisitable" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="3" Y="5.75" />
+        <Point X="3" Y="4.705" />
+        <Point X="10.75" Y="4.705" />
+      </Path>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAgAAAAQAAAAAAAAAAAAAAAAAAAACAAAAABA=</HashCode>
+      <FileName>UmbracoQueryGrammar.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Content" />
+      <Property Name="OrderModifier" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Our.Umbraco.Query.Language.OrderModifierNode" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAACAAAAAAA=</HashCode>
+      <FileName>UmbracoQueryGrammar.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Irony.Interpreter.Ast.IdentifierNode" Collapsed="true">
+    <Position X="8.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Interface Name="Our.Umbraco.Query.Language.IQueryVisitor">
+    <Position X="10.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>IQueryVisitor.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Our.Umbraco.Query.Language.IVisitable">
+    <Position X="10.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UmbracoQueryGrammar.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

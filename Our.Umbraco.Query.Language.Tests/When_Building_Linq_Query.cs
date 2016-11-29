@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Irony.Interpreter.Ast;
 using Moq;
 using NUnit.Framework;
 
@@ -17,7 +18,7 @@ namespace Our.Umbraco.Query.Language.Tests
             var cache = Mock.Of<IContentCache>();
 
             var visitor = new PublishedCacheQueryVisitor(cache);
-            var result = visitor.Execute((QueryNode)tree.Root.AstNode);
+            var result = visitor.Execute((IVisitable)tree.Root.AstNode);
 
             Mock.Get(cache).Verify(c => c.GetContentByXPath("//news"));
         }
@@ -35,7 +36,7 @@ namespace Our.Umbraco.Query.Language.Tests
             });
 
             var visitor = new PublishedCacheQueryVisitor(cache);
-            var result = visitor.Execute((QueryNode)tree.Root.AstNode);
+            var result = visitor.Execute((IVisitable)tree.Root.AstNode);
 
             Assert.That(result.First(), Has.Property("CreateDate").EqualTo(DateTime.Today.AddDays(1)));
         }
@@ -43,17 +44,17 @@ namespace Our.Umbraco.Query.Language.Tests
         [Test]
         public void Limits_Ordered_Result()
         {
-            var program = "latest 1 news";
+            var program = "latest 1 article";
             var tree = ParseTree(program);
             var cache = Mock.Of<IContentCache>();
-            Mock.Get(cache).Setup(c => c.GetContentByXPath("//news")).Returns(new List<IPublishedContent>
+            Mock.Get(cache).Setup(c => c.GetContentByXPath("//article")).Returns(new List<IPublishedContent>
             {
                 Mock.Of<IPublishedContent>(c => c.CreateDate == DateTime.Today),
                 Mock.Of<IPublishedContent>(c => c.CreateDate == DateTime.Today.AddDays(1))
             });
 
             var visitor = new PublishedCacheQueryVisitor(cache);
-            var result = visitor.Execute((QueryNode)tree.Root.AstNode);
+            var result = visitor.Execute((IVisitable)tree.Root.AstNode);
 
             Assert.That(result.Single(), Has.Property("CreateDate").EqualTo(DateTime.Today.AddDays(1)));
         }
@@ -62,31 +63,37 @@ namespace Our.Umbraco.Query.Language.Tests
     public class PublishedCacheQueryVisitor : IQueryVisitor
     {
         private readonly IContentCache cache;
-        private IEnumerable<IPublishedContent> current;
+        private IQueryable<IPublishedContent> current;
+        private int? limit;
 
         public PublishedCacheQueryVisitor(IContentCache cache)
         {
             this.cache = cache;
         }
 
-        public IEnumerable<IPublishedContent> Execute(QueryNode queryNode)
+        public IQueryable<IPublishedContent> Execute(IVisitable queryNode)
         {
             queryNode.Visit(this);
+
+            if (limit != null)
+                current = current.Take(limit.Value);
+
             return current;
         }
 
-        void IQueryVisitor.Visit(QueryNode queryNode)
+        void IQueryVisitor.Visit(IVisitable node)
         {
+            node.Visit(this);
         }
 
         void IQueryVisitor.Visit(ContentNode contentNode)
         {
-            current = cache.GetContentByXPath("//" + contentNode.ContentType);
+            current = cache.GetContentByXPath("//" + contentNode.ContentType).AsQueryable();
         }
 
         void IQueryVisitor.Visit(LimitModifierNode limitNode)
         {
-            current = current.Take(limitNode.Limit);
+            limit = limitNode.Limit;
         }
 
         void IQueryVisitor.Visit(OrderModifierNode orderedNode)

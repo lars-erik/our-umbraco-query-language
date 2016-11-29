@@ -18,7 +18,7 @@ namespace Our.Umbraco.Query.Language.Tests
             var program = "news";
             var tree = ParseTree(program);
             Assert.That(tree.Root.AstNode, 
-                Is.InstanceOf<QueryNode>() &
+                Is.InstanceOf<IVisitable>() &
                 Has.Property("Source").InstanceOf<ContentNode>()
             );
         }
