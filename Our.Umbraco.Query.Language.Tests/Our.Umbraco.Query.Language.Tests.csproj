@@ -61,7 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ParsingTest.cs" />
-    <Compile Include="When_Building_Expression.cs" />
+    <Compile Include="When_Building_Linq_Query.cs" />
     <Compile Include="When_Parsing_Query.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

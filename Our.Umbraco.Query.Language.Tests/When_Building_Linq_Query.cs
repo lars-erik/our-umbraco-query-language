@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Irony.Interpreter.Ast;
 using Moq;
 using NUnit.Framework;
 
 namespace Our.Umbraco.Query.Language.Tests
 {
     [TestFixture]
-    public class When_Building_Expression : ParsingTest
+    public class When_Building_Linq_Query : ParsingTest
     {
         [Test]
         public void Gets_Content_Of_Type_From_Cache()
@@ -22,9 +17,7 @@ namespace Our.Umbraco.Query.Language.Tests
             var cache = Mock.Of<IContentCache>();
 
             var visitor = new PublishedCacheQueryVisitor(cache);
-            var call = visitor.Visit((QueryNode)tree.Root.AstNode);
-
-            call();
+            var result = visitor.Execute((QueryNode)tree.Root.AstNode);
 
             Mock.Get(cache).Verify(c => c.GetContentByXPath("//news"));
         }
@@ -42,9 +35,7 @@ namespace Our.Umbraco.Query.Language.Tests
             });
 
             var visitor = new PublishedCacheQueryVisitor(cache);
-            var call = visitor.Visit((QueryNode)tree.Root.AstNode);
-
-            var result = call();
+            var result = visitor.Execute((QueryNode)tree.Root.AstNode);
 
             Assert.That(result.First(), Has.Property("CreateDate").EqualTo(DateTime.Today.AddDays(1)));
         }
@@ -62,62 +53,45 @@ namespace Our.Umbraco.Query.Language.Tests
             });
 
             var visitor = new PublishedCacheQueryVisitor(cache);
-            var call = visitor.Visit((QueryNode)tree.Root.AstNode);
-
-            var result = call();
+            var result = visitor.Execute((QueryNode)tree.Root.AstNode);
 
             Assert.That(result.Single(), Has.Property("CreateDate").EqualTo(DateTime.Today.AddDays(1)));
         }
     }
 
-    public class PublishedCacheQueryVisitor
+    public class PublishedCacheQueryVisitor : IQueryVisitor
     {
         private readonly IContentCache cache;
-        //private readonly ParameterExpression cacheExpr;
-        //private static readonly Type CacheType = typeof (IContentCache);
-        //private static readonly MethodInfo ContentByXPathMethod = CacheType.GetMethod("GetContentByXPath");
+        private IEnumerable<IPublishedContent> current;
 
         public PublishedCacheQueryVisitor(IContentCache cache)
         {
             this.cache = cache;
-            //cacheExpr = Expression.Parameter(typeof(IContentCache), "cache");
         }
 
-        #warning This should probably not be a contract. For lucene, a query?
-        public Func<IEnumerable<IPublishedContent>> Visit(QueryNode queryNode)
+        public IEnumerable<IPublishedContent> Execute(QueryNode queryNode)
         {
-            var limit = queryNode.Source.Limit;
-            var expression = Visit(queryNode.Source);
-            if (queryNode.OrderModifier != null)
-            {
-                expression = Visit(queryNode.OrderModifier, expression);
-            }
-            if (limit != null)
-            {
-                expression = Limit(limit, expression);
-            }
-
-            return expression;
+            queryNode.Visit(this);
+            return current;
         }
 
-        private Func<IEnumerable<IPublishedContent>> Visit(LimitedContentNode limitedNode)
+        void IQueryVisitor.Visit(QueryNode queryNode)
         {
-            Func<IEnumerable<IPublishedContent>> accessor = () =>
-                cache.GetContentByXPath("//" + limitedNode.Source.Symbol);
-
-            return accessor;
         }
 
-        private Func<IEnumerable<IPublishedContent>> Visit(OrderModifierNode orderedNode, Func<IEnumerable<IPublishedContent>> original)
+        void IQueryVisitor.Visit(ContentNode contentNode)
         {
-            Func<IEnumerable<IPublishedContent>> sorter = () => original().OrderByDescending(c => c.CreateDate);
-
-            return sorter;
+            current = cache.GetContentByXPath("//" + contentNode.ContentType);
         }
 
-        private Func<IEnumerable<IPublishedContent>> Limit(LiteralValueNode limit, Func<IEnumerable<IPublishedContent>> expression)
+        void IQueryVisitor.Visit(LimitModifierNode limitNode)
         {
-            return () => expression().Take(Convert.ToInt32(limit.Value));
+            current = current.Take(limitNode.Limit);
+        }
+
+        void IQueryVisitor.Visit(OrderModifierNode orderedNode)
+        {
+            current = current.OrderByDescending(c => c.CreateDate);
         }
     }
 

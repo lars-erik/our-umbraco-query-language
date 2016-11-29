@@ -19,7 +19,7 @@ namespace Our.Umbraco.Query.Language.Tests
             var tree = ParseTree(program);
             Assert.That(tree.Root.AstNode, 
                 Is.InstanceOf<QueryNode>() &
-                Has.Property("Source").InstanceOf<LimitedContentNode>()
+                Has.Property("Source").InstanceOf<ContentNode>()
             );
         }
 
@@ -39,7 +39,8 @@ namespace Our.Umbraco.Query.Language.Tests
             var program = "5 news";
             var tree = ParseTree(program);
             Assert.That(tree.Root.AstNode,
-                Has.Property("Source").InstanceOf<LimitedContentNode>()
+                Has.Property("Source").InstanceOf<ContentNode>() &
+                Has.Property("LimitModifier").InstanceOf<LimitModifierNode>()
                 );
         }
 
@@ -49,7 +50,7 @@ namespace Our.Umbraco.Query.Language.Tests
             var program = "latest 5 news";
             var tree = ParseTree(program);
             Assert.That(tree.Root.AstNode,
-                Has.Property("Source").InstanceOf<LimitedContentNode>() &
+                Has.Property("LimitModifier").InstanceOf<LimitModifierNode>() &
                 Has.Property("OrderModifier").InstanceOf<OrderModifierNode>()
                 );
         }
