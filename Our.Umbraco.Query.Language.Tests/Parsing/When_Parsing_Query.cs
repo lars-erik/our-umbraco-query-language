@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Irony.Interpreter.Ast;
-using Irony.Parsing;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
-namespace Our.Umbraco.Query.Language.Tests
+namespace Our.Umbraco.Query.Language.Tests.Parsing
 {
     [TestFixture]
     public class When_Parsing_Query : ParsingTest

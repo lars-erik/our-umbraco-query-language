@@ -21,7 +21,7 @@ namespace Our.Umbraco.Query.Language.Tests
         }
 
         [Test]
-        public void Keeps_Order_And_Limit_From_Query()
+        public void Adds_Order_And_Limit()
         {
             var queryString = "latest 1 news";
             var tree = ParseTree(queryString);

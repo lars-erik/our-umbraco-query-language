@@ -48,7 +48,7 @@
       <Property Name="Content" />
       <Property Name="OrderModifier" />
     </ShowAsAssociation>
-    <Lollipop Position="0.2" Collapsed="true" />
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="Our.Umbraco.Query.Language.OrderModifierNode" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="4.75" Y="5.75" Width="1.5" />

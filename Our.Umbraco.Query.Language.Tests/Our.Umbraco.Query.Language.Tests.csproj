@@ -69,9 +69,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ParsingTest.cs" />
+    <Compile Include="Parsing\When_Parsing_Source.cs" />
     <Compile Include="When_Building_ContentCache_Query.cs" />
     <Compile Include="When_Building_Lucene_Query.cs" />
-    <Compile Include="When_Parsing_Query.cs" />
+    <Compile Include="Parsing\When_Parsing_Query.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

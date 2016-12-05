@@ -15,6 +15,7 @@ namespace Our.Umbraco.Query.Language
         public UmbracoQueryGrammar() : base(false)
         {
             var contentTypeAlias = new IdentifierTerminal("contentType");
+            var route = new StringLiteral("route", "'");
 
             var number = new NumberLiteral("number");
 
@@ -27,10 +28,14 @@ namespace Our.Umbraco.Query.Language
             var limitedContent = new NonTerminal("limitedContent", typeof(LimitedContentNode));
             var orderedContent = new NonTerminal("orderedContent", typeof(OrderedContentNode));
 
+            var source = new NonTerminal("source", typeof(SourceNode));
+
             orderedContent.Rule = orderModifier + content | orderModifier + limitedContent;
             limitedContent.Rule = limitModifier + content;
 
-            content.Rule = contentType;
+            source.Rule = "from" + route;
+
+            content.Rule = contentType | contentType + source;
             contentType.Rule = contentTypeAlias;
             limitModifier.Rule = number;
 
@@ -47,6 +52,23 @@ namespace Our.Umbraco.Query.Language
     public interface IVisitable
     {
         void Visit(IQueryVisitor visitor);
+    }
+
+    public class SourceNode : AstNode, IVisitable
+    {
+        public LiteralValueNode Route { get; set; }
+
+        public override void Init(AstContext context, ParseTreeNode treeNode)
+        {
+            base.Init(context, treeNode);
+
+            Route = ((LiteralValueNode)treeNode.ChildNodes.Last().AstNode);
+        }
+
+        public void Visit(IQueryVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 
     public class OrderedContentNode : AstNode, IVisitable
@@ -92,6 +114,7 @@ namespace Our.Umbraco.Query.Language
     public class ContentNode : AstNode, IVisitable
     {
         public IdentifierNode Identifier { get; set; }
+        public SourceNode Source { get; set; }
 
         public string ContentType
         {
@@ -103,11 +126,14 @@ namespace Our.Umbraco.Query.Language
             base.Init(context, treeNode);
 
             Identifier = treeNode.ChildNodes[0].AstNode as IdentifierNode;
+            if (treeNode.ChildNodes.Count > 1)
+                Source = (SourceNode)treeNode.ChildNodes[1].AstNode;
         }
 
         public void Visit(IQueryVisitor visitor)
         {
             visitor.Visit(this);
+            visitor.Visit(Source);
         }
     }
 
